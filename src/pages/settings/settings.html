@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      API Key
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-list>
+    <ion-item>
+    <ion-label color="primary" stacked>API Key</ion-label>
+    <ion-input type="text" placeholder="API Key"  [(ngModel)]="apiKey" (input)="apiKeyChanged()"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label color="primary" stacked>Private Key</ion-label>
+    <ion-input type="password" placeholder="Private Key"  [(ngModel)]="privateKey" (input)="privateKeyChanged()"></ion-input>
+  </ion-item>
+  </ion-list>
+
+</ion-content>
