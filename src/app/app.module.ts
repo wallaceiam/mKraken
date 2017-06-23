@@ -46,8 +46,8 @@ import { KrakenService} from '../services/kraken.service';
     SplashScreen,
     KrakenService,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    {provide: 'apiEndPoint', useValue: 'http://localhost:8100/api' }
-    // {provide: 'apiEndPoint', useValue: 'https://api.kraken.com' }
+    // {provide: 'apiEndPoint', useValue: 'http://localhost:8100/api' }
+     {provide: 'apiEndPoint', useValue: 'https://api.kraken.com' }
   ]
 })
 export class AppModule {}
