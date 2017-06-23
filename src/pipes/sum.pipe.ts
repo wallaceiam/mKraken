@@ -8,7 +8,7 @@ import { Ticker } from './../models/ticker';
 })
 export class SumPipe implements PipeTransform {
     transform(balances: Balance[], xbtGbp: Ticker): number {
-        if(!balances || !xbtGbp) {
+        if (!balances || !xbtGbp) {
             return NaN;
         }
 

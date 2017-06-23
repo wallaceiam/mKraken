@@ -1,0 +1,21 @@
+<ion-header>
+    <ion-navbar>
+        <ion-title>
+            News
+        </ion-title>
+    </ion-navbar>
+</ion-header>
+
+<ion-content class="card-page">
+
+    <ion-card>
+        <div class="card-title">{{ newsItem.title }}</div>
+        <div class="card-subtitle">{{ newsItem.pubDate | date }}</div>
+    </ion-card>
+
+
+    <div [innerHtml]="newsItem.content"></div>
+
+    <button ion-button clear (click)="openLink(newsItem.link)">Read more</button>
+
+</ion-content>

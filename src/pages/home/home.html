@@ -4,21 +4,57 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
-  <h2>Welcome to Ionic!</h2>
-  <h1 *ngIf="balances && xbtGbp">
-    {{ balances | sum:xbtGbp | currency:'GBP' }}
-  </h1>
-  <p>
-    Take a look at the <code>src/pages/</code> directory to add or change tabs, update any existing page or create new pages.
-  </p>
+<ion-content>
+  <ion-refresher (ionRefresh)="refresh($event)">
+    <ion-refresher-content pullingIcon="arrow-dropdown" pullingText="Pull to refresh" refreshingSpinner="circles" refreshingText="Refreshing...">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <ion-card *ngIf="balances && xbtGbp">
+    <h1 >
+      {{ balances | sum:xbtGbp | currency:'GBP' }}
+    </h1>
+    <h2 [class.priceUp]="(balances | totalprofitloss: xbtGbp) > 0" [class.priceDown]="(balances | totalprofitloss: xbtGbp) < 0">
+      <span class="absl">{{ balances | totalprofitloss: xbtGbp | currency:'GBP' }}</span>
+      <span class="perc">{{ balances | totalprofitlossperc: xbtGbp | percent:'1.2-2' }}</span>
+      </h2>
+  </ion-card>
   <p></p>
   <ion-list *ngIf="balances && xbtGbp">
     <ion-item *ngFor="let b of balances">
-      {{ b.displayCurrency }} - {{ b.value }} - {{ ( b.value * (b.ticker ? b.ticker.bid.price : 1) * xbtGbp.bid.price) | currency:'GBP'
-      }}
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <div class="var-height-8">
+                <i class="cc cryptocoin cc-{{(b.displayCurrency === 'XBT' ? 'BTC' : b.displayCurrency )}} coin-{{(b.displayCurrency === 'XBT' ? 'BTC' : b.displayCurrency )}}-alt" ></i>
+                {{(b.displayCurrency === 'XBT' ? 'BTC' : b.displayCurrency )}}
+            </div>
+          </ion-col>
+          <ion-col>
+            <div></div>
+          </ion-col>
+
+          <ion-col>
+            <div class="var-height-8 pnl" [class.priceUp]="(b | profitloss: xbtGbp) > 0" [class.priceDown]="(b | profitloss: xbtGbp) < 0">
+              <span class="absl">{{ b | profitloss: xbtGbp | number:'1.2-2' }}</span>
+              <span class="perc">{{ b | profitlossperc: xbtGbp | percent:'1.2-2' }}</span>
+            </div>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <!-- col-6 >-->
+            <div class="var-height-4">{{ b.value }}</div>
+          </ion-col>
+          <ion-col>
+            <div class="var-height-4">@ {{ (b.ticker ? b.ticker.bid.price : xbtGbp.bid.price ) | number:'1.2-5' }}</div>
+          </ion-col>
+          <ion-col>
+            <div class="var-height-2 right-align">{{ ( b.value * (b.ticker ? b.ticker.bid.price : 1) * xbtGbp.bid.price) | currency:'GBP' }}</div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </ion-item>
   </ion-list>
 
-  <button ion-button (click)="refresh()">Refresh</button>
 </ion-content>
