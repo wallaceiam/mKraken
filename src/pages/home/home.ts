@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { NavController } from 'ionic-angular';
+import { NavController, ToastController } from 'ionic-angular';
 
 import { KrakenService } from './../../services/kraken.service';
 import { Balance } from './../../models/balance';
@@ -15,11 +15,11 @@ export class HomePage {
   balances: Balance[];
   xbtGbp: Ticker;
 
-  constructor(public navCtrl: NavController, private storage: Storage, private kraken: KrakenService) {
+  constructor(public navCtrl: NavController, private storage: Storage, private toastCtrl: ToastController, private kraken: KrakenService) {
 
   }
 
-  refresh() {
+  refresh(refresher: any) {
     this.kraken.getAssetInfo()
       .subscribe(a => {
         console.log(a);
@@ -34,11 +34,11 @@ export class HomePage {
             this.kraken.getTickerInformation(this.balances)
               .subscribe(ti => {
                 Object.keys(ti).forEach(key => {
-                  if(key === 'XXBTZGBP') {
+                  if (key === 'XXBTZGBP') {
                     this.xbtGbp = ti[key];
                   } else {
                     this.balances.forEach(b => {
-                      if(key === b.currency + 'XBT' || key === b.currency + 'XXBT') {
+                      if (key === b.currency + 'XBT' || key === b.currency + 'XXBT') {
                         b.ticker = ti[key];
                       }
                     })
@@ -48,10 +48,20 @@ export class HomePage {
                 console.log(this.balances);
               });
           },
-          e => console.error(e),
-          () => { });
+          e => { this.displayError(e); },
+          () => { refresher.complete(); });
       });
     });
+  }
+
+  displayError(err: any) {
+    let toast = this.toastCtrl.create({
+      message: err,
+      duration: 3000,
+      position: 'top',
+      cssClass: 'warning'
+    });
+    toast.present();
   }
 
 }

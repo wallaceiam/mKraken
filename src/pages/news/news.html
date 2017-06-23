@@ -1,0 +1,21 @@
+<ion-header>
+    <ion-navbar>
+        <ion-title>
+            News
+        </ion-title>
+    </ion-navbar>
+</ion-header>
+
+<ion-content class="card-background-page">
+    <ion-refresher (ionRefresh)="refresh($event)">
+        <ion-refresher-content pullingIcon="arrow-dropdown" pullingText="Pull to refresh" refreshingSpinner="circles" refreshingText="Refreshing...">
+        </ion-refresher-content>
+    </ion-refresher>
+
+    <ion-card *ngFor="let n of (news ? news.items : [])" (click)="openNewsItem(n)">
+        <img [src]="n.thumbnail" />
+        <div class="card-title">{{ n.title }}</div>
+        <div class="card-subtitle">{{ n.pubDate | date }}</div>
+    </ion-card>
+
+</ion-content>

@@ -1,3 +1,38 @@
+@import '../../theme/variables';
+
 page-home {
 
+    h1, h2 {
+        text-align: center;
+    }
+
+
+    .cc {
+        max-height: 32px;
+        max-width: 32px;
+    }
+
+    .var-height-2 {
+        font-size: 4vw;
+    }
+
+    .var-height-4 {
+        font-size: 4vw;
+    }
+
+    .var-height-8 {
+        font-size: 6vw;
+    }
+
+    .pnl, .right-align {
+        text-align: right;
+    }
+
+    .priceUp {
+        color: $color-priceUp;
+    }
+
+    .priceDown {
+        color: $color-priceDown;
+    }
 }
