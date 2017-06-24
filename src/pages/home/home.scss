@@ -1,38 +1,84 @@
 @import '../../theme/variables';
-
 page-home {
-
-    h1, h2 {
-        text-align: center;
+  .card-background {
+    position: relative;
+    text-align: center;
+    background-color: #3498db;
+    min-height: 250px;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    .card-title {
+      position: absolute;
+      top: 25%;
+      font-size: 3.5em;
+      width: 100%;
+      font-weight: bold;
+      color: #ecf0f1;
     }
-
-
-    .cc {
-        max-height: 32px;
-        max-width: 32px;
+    .card-subtitle {
+      font-size: 1.0em;
+      font-weight: bold;
+      position: absolute;
+      bottom: 30%;
+      right: 0;
+      left: 0;
+      color: #ecf0f1;
     }
-
-    .var-height-2 {
-        font-size: 4vw;
+    .card-sub-subtitle {
+      font-size: 1.5em;
+      font-weight: bold;
+      position: absolute;
+      bottom: 15%;
+      right: 0;
+      left: 0;
+      color: #ecf0f1;
     }
-
-    .var-height-4 {
-        font-size: 4vw;
-    }
-
-    .var-height-8 {
-        font-size: 6vw;
-    }
-
-    .pnl, .right-align {
-        text-align: right;
-    }
-
     .priceUp {
-        color: $color-priceUp;
+      color: $color-priceUp;
     }
-
     .priceDown {
-        color: $color-priceDown;
+      color: $color-priceDown;
     }
+  }
+  .list-ios>.item-block:first-child {
+    border-top: none !important;
+  }
+  .list-ios > .item-block:last-child, .list-ios > .item-wrapper:last-child .item-block {
+    border-bottom: none !important;
+  }
+
+   ion-item {
+  //   padding-left: 0px !important;
+    padding-right: 16px !important;
+  //   margin-left: 0px !important;
+  //   margin-right: 0px !important;
+  }
+  .cc {
+    max-height: 32px;
+    max-width: 32px;
+  }
+  .var-height-2 {
+    font-size: 4vw;
+  }
+  .var-height-4 {
+    font-size: 4vw;
+  }
+  .var-height-8 {
+    font-size: 6vw;
+  }
+  .pnl,
+  .right-align {
+    text-align: right;
+  }
+  .priceUp {
+    color: $color-priceUp;
+  }
+  .priceDown {
+    color: $color-priceDown;
+  }
+  .absl {
+    font-size: 3.5vw;
+  }
 }

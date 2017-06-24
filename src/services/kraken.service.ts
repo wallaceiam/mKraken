@@ -5,14 +5,16 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/zip';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/operator/catch';
 
 // import { Hash, HMAC } from "fast-sha256";
 import * as CryptoJS from 'crypto-js';
 
-import { Balance } from './../models/balance';
+import { Balance, CurrentHoldings, Holding } from './../models/balance';
 import { Assets, Asset } from './../models/asset';
 import { TickerInformation, Ticker, TickerPoint, TickerTradePoint } from './../models/ticker';
 
@@ -25,7 +27,68 @@ export class KrakenService {
     private assetsUrl: string = '/0/public/Assets';
     private tickerInformationUrl: string = '/0/public/Ticker'
 
-    constructor( @Inject('apiEndPoint') private apiEndPoint: string, private http: Http) { }
+    constructor( @Inject('apiEndPoint') private apiEndPoint: string, private http: Http, private storage: Storage) { }
+
+    getOverview(): Observable<CurrentHoldings> {
+
+        let cacheHitObj = Observable.fromPromise(this.storage.get('balanceInfo'))
+
+        return cacheHitObj.switchMap(hit => {
+
+            let now = new Date();
+            if (hit  && hit.dt && Math.abs((now.getTime() - new Date(hit.dt).getTime()) / 1000) > 30000) {
+                return Observable.of(hit.result as CurrentHoldings);
+            }
+
+            let apiKeyObjs = Observable.fromPromise(this.storage.get('apiKey'));
+            let priKeyObjs = Observable.fromPromise(this.storage.get('privateKey'));
+            let fiatObjs = Observable.of('GBP');
+
+            return apiKeyObjs.switchMap(apiKey =>
+                priKeyObjs.switchMap(privateKey =>
+                    fiatObjs.switchMap(fiatKey =>
+                        this.getBalance(apiKey, privateKey)
+                            .switchMap(balances => {
+                                return this.getTickerInformation(balances).map(ti => {
+
+                                    let currentHoldings = new CurrentHoldings();
+                                    currentHoldings.holdings = new Array<Holding>();
+
+                                    let fiatTicker = ti['XBTZ' + fiatKey] ? ti['XBTZ' + fiatKey] :
+                                        (ti['XXBTZ' + fiatKey] ? ti['XXBTZ' + fiatKey] : null);
+
+                                    currentHoldings.xbtFiatCurrentPrice = fiatTicker ? fiatTicker.ask.price : 1;
+                                    currentHoldings.xbtFiatExchangeCurrency = 'Z' + fiatKey;
+                                    currentHoldings.xbtFiatExchangeDisplayCurrency = fiatKey;
+                                    currentHoldings.xbtFiatOpenningPrice = fiatTicker ? fiatTicker.opening : 1;
+
+                                    balances.forEach(b => {
+                                        let ticker = ti[b.currency + 'XBT'] ? ti[b.currency + 'XBT'] :
+                                            (ti[b.currency + 'XXBT'] ? ti[b.currency + 'XXBT'] :
+                                                (ti['X' + b.currency + 'XBT'] ? ti['X' + b.currency + 'XBT'] :
+                                                    ti['X' + b.currency + 'XXBT'])
+                                            );
+
+                                        let h = new Holding();
+                                        h.currency = b.currency;
+                                        h.currentPrice = ticker ? ticker.ask.price : 1;
+                                        h.displayCurrency = b.displayCurrency;
+                                        h.exchangeCurrency = ticker ? 'XBT' : b.currency;
+                                        h.exchangeDisplayCurrency = ticker ? 'BTC' : b.displayCurrency;
+                                        h.openningPrice = ticker ? ticker.opening : 1;
+                                        h.value = b.value; //* 1000;
+                                        currentHoldings.holdings.push(h);
+                                    });
+
+                                    this.storage.set('balanceInfo', { dt: new Date(), result: currentHoldings });
+                                    return currentHoldings;
+                                });
+                            })
+                    )
+                )
+            );
+        });
+    }
 
     getBalance(apiKey: string, privateKey: string): Observable<Balance[]> {
 
@@ -74,7 +137,7 @@ export class KrakenService {
                         }
 
                         let val = +res.result[key];
-                        balances.push(new Balance(key, cur, +val));
+                        balances.push(new Balance(cur, cur === 'XBT' ? 'BTC' : cur, +val));
                     });
                 }
                 return balances;
@@ -85,9 +148,17 @@ export class KrakenService {
     getAssetInfo(): Observable<Assets> {
         // https://api.kraken.com/0/public/Assets
 
-        return this.http.get(
-            this.apiEndPoint + this.assetsUrl,
-        )
+        let cacheHitObj = Observable.fromPromise(this.storage.get('assetInfo'))
+
+        return cacheHitObj.switchMap(hit => {
+
+            if (hit) {
+                return Observable.of(hit.result as Assets);
+            }
+
+            return this.http.get(
+                this.apiEndPoint + this.assetsUrl,
+            )
             .map(res => {
                 let body = res.json();
                 return body || {};
@@ -113,8 +184,10 @@ export class KrakenService {
                         );
                     });
                 }
+                this.storage.set('assetInfo', { dt: new Date(), result: assets });
                 return assets;
             });
+        });
     }
 
     getTickerInformation(balances: Balance[]): Observable<TickerInformation> {
@@ -122,8 +195,8 @@ export class KrakenService {
 
         let pairs = 'pair=XBTGBP,';
         pairs += balances
-            .filter(b => b.displayCurrency !== 'XBT' && b.displayCurrency !== 'GBP')
-            .map(b => b.displayCurrency + 'XBT').join(',');
+            .filter(b => b.currency !== 'XBT' && b.currency !== 'GBP')
+            .map(b => b.currency + 'XBT').join(',');
 
         // let headers = new Headers();
         // headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -152,7 +225,7 @@ export class KrakenService {
             });
 
     }
-    
+
     private _mapToTickerTradePoint(val: any): TickerTradePoint {
         return new TickerTradePoint(+val[0], +val[1], +val[2]);
     }

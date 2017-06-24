@@ -14,13 +14,13 @@ export class TotalProfiteLossPipe implements PipeTransform {
         }
 
         let totalXbt = balances.reduce((c, b) => {
-            c.totalBid += b.value * (b.ticker ? b.ticker.bid.price : 1);
+            c.totalBid += b.value * (b.ticker ? b.ticker.ask.price : 1);
             c.totalOpen += b.value * (b.ticker ? b.ticker.opening : 1);
             return c;
         }, { totalBid: 0, totalOpen: 0 });
 
         if (totalXbt.totalOpen !== 0) {
-            return (totalXbt.totalBid * xbtGbp.bid.price) - (totalXbt.totalOpen * xbtGbp.bid.price);
+            return (totalXbt.totalBid * xbtGbp.ask.price) - (totalXbt.totalOpen * xbtGbp.ask.price);
         } else {
             return NaN;
         }
@@ -37,13 +37,13 @@ export class TotalProfiteLossPercentPipe implements PipeTransform {
         }
 
         let totalXbt = balances.reduce((c, b) => {
-            c.totalBid += b.value * (b.ticker ? b.ticker.bid.price : 1);
+            c.totalBid += b.value * (b.ticker ? b.ticker.ask.price : 1);
             c.totalOpen += b.value * (b.ticker ? b.ticker.opening : 1);
             return c;
         }, { totalBid: 0, totalOpen: 0 });
 
         if (totalXbt.totalOpen !== 0) {
-            return ( (totalXbt.totalBid * xbtGbp.bid.price) - (totalXbt.totalOpen * xbtGbp.bid.price) ) / (totalXbt.totalOpen * xbtGbp.bid.price);
+            return ( (totalXbt.totalBid * xbtGbp.ask.price) - (totalXbt.totalOpen * xbtGbp.ask.price) ) / (totalXbt.totalOpen * xbtGbp.ask.price);
         } else {
             return NaN;
         }
@@ -60,7 +60,7 @@ export class ProfiteLossPipe implements PipeTransform {
             return NaN;
         }
 
-        return balance.ticker ? balance.ticker.bid.price - balance.ticker.opening : xbtGbp.bid.price - xbtGbp.opening;
+        return balance.ticker ? balance.ticker.ask.price - balance.ticker.opening : xbtGbp.ask.price - xbtGbp.opening;
     }
 }
 
@@ -74,8 +74,8 @@ export class ProfiteLossPercentPipe implements PipeTransform {
         }
 
         return balance.ticker ?
-            (balance.ticker.bid.price - balance.ticker.opening) / balance.ticker.opening
-            : (xbtGbp.bid.price - xbtGbp.opening) / xbtGbp.opening;
+            (balance.ticker.ask.price - balance.ticker.opening) / balance.ticker.opening
+            : (xbtGbp.ask.price - xbtGbp.opening) / xbtGbp.opening;
     }
 }
 

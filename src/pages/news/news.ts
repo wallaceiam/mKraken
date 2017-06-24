@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
 import { Feed, FeedEntry } from './../../models/news';
@@ -9,7 +9,7 @@ import { NewsItemPage } from './newsitem';
   selector: 'page-news',
   templateUrl: 'news.html'
 })
-export class NewsPage {
+export class NewsPage implements OnInit {
 
     news: Feed;
 
@@ -17,13 +17,18 @@ export class NewsPage {
 
   }
 
+  ngOnInit() {
+      this.refresh(null);
+  }
+
   refresh(refresher: any) {
       this.newsService.getNews().subscribe(
           n => this.news = n,
           e => {},
           () => {
-              console.log(this.news);
-              refresher.complete();
+              if(refresher) {
+                refresher.complete();
+              }
           }
       );
     }

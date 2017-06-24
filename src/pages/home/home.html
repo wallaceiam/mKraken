@@ -5,56 +5,90 @@
 </ion-header>
 
 <ion-content>
-  <ion-refresher (ionRefresh)="refresh($event)">
+  <ion-refresher (ionRefresh)="refresh($event)" [pullMin]="120" [pullMax]="240">
     <ion-refresher-content pullingIcon="arrow-dropdown" pullingText="Pull to refresh" refreshingSpinner="circles" refreshingText="Refreshing...">
     </ion-refresher-content>
   </ion-refresher>
 
-  <ion-card *ngIf="balances && xbtGbp">
-    <h1 >
-      {{ balances | sum:xbtGbp | currency:'GBP' }}
-    </h1>
-    <h2 [class.priceUp]="(balances | totalprofitloss: xbtGbp) > 0" [class.priceDown]="(balances | totalprofitloss: xbtGbp) < 0">
-      <span class="absl">{{ balances | totalprofitloss: xbtGbp | currency:'GBP' }}</span>
-      <span class="perc">{{ balances | totalprofitlossperc: xbtGbp | percent:'1.2-2' }}</span>
-      </h2>
+  <ion-card *ngIf="currentHoldings && assetInformation" class="card-background">
+
+    <div class="card-title">{{ currentHoldings.totalPrice | cryptocurrency:assetInformation:currentHoldings.xbtFiatExchangeCurrency }}</div>
+    <div class="card-sub-subtitle" [class.priceUp]="currentHoldings.totalProfitLoss > 0" [class.priceDown]="currentHoldings.totalProfitLoss < 0">
+      {{ currentHoldings.totalProfitLoss | cryptocurrency:assetInformation:currentHoldings.xbtFiatExchangeCurrency }} {{ currentHoldings.totalProfitLossPercent
+      | percent:'1.2-2' }}
+    </div>
+    <div class="card-subtitle">
+      <i class="cc cryptocoin cc-BTC coin-BTC-alt"></i> {{ currentHoldings.totalValue | cryptocurrency:assetInformation:'XBT'}}
+      @ {{ currentHoldings.xbtFiatCurrentPrice | cryptocurrency:assetInformation:currentHoldings.xbtFiatExchangeCurrency
+      }}
+    </div>
+
   </ion-card>
-  <p></p>
-  <ion-list *ngIf="balances && xbtGbp">
-    <ion-item *ngFor="let b of balances">
+
+  <ion-list *ngIf="currentHoldings && currentHoldings.holdings">
+    <ion-item *ngFor="let h of currentHoldings.holdings">
       <ion-grid>
         <ion-row>
           <ion-col>
             <div class="var-height-8">
-                <i class="cc cryptocoin cc-{{(b.displayCurrency === 'XBT' ? 'BTC' : b.displayCurrency )}} coin-{{(b.displayCurrency === 'XBT' ? 'BTC' : b.displayCurrency )}}-alt" ></i>
-                {{(b.displayCurrency === 'XBT' ? 'BTC' : b.displayCurrency )}}
+              <i class="cc cryptocoin cc-{{h.displayCurrency}} coin-{{h.displayCurrency}}-alt"></i> {{h.displayCurrency}}
             </div>
           </ion-col>
           <ion-col>
-            <div></div>
+            <div>
+
+            </div>
           </ion-col>
 
           <ion-col>
-            <div class="var-height-8 pnl" [class.priceUp]="(b | profitloss: xbtGbp) > 0" [class.priceDown]="(b | profitloss: xbtGbp) < 0">
-              <span class="absl">{{ b | profitloss: xbtGbp | number:'1.2-2' }}</span>
-              <span class="perc">{{ b | profitlossperc: xbtGbp | percent:'1.2-2' }}</span>
+            <div class="var-height-8 pnl" [class.priceUp]="h.profitLoss > 0" [class.priceDown]="h.profitLoss < 0">
+              <span class="absl">{{ h.profitLoss * currentHoldings.xbtFiatCurrentPrice | cryptocurrency:assetInformation:currentHoldings.xbtFiatExchangeCurrency }}</span>
+              <!-- | cryptocurrency:assetInformation:h.exchangeCurrency  }}</span>-->
+              <span class="perc">{{ h.profitLossPercent | percent:'1.2-2' }}</span>
             </div>
           </ion-col>
         </ion-row>
+
         <ion-row>
           <ion-col>
             <!-- col-6 >-->
-            <div class="var-height-4">{{ b.value }}</div>
+            <div class="var-height-4">{{ h.value | number:'1.5-5' }}</div>
           </ion-col>
           <ion-col>
-            <div class="var-height-4">@ {{ (b.ticker ? b.ticker.bid.price : xbtGbp.bid.price ) | number:'1.2-5' }}</div>
+            <div class="var-height-4">@
+              <i class="cc cryptocoin cc-{{h.exchangeDisplayCurrency}} coin-{{h.exchangeDisplayCurrency}}-alt"></i> {{ h.currentPrice
+              | cryptocurrency:assetInformation:h.exchangeCurrency }}
+            </div>
           </ion-col>
           <ion-col>
-            <div class="var-height-2 right-align">{{ ( b.value * (b.ticker ? b.ticker.bid.price : 1) * xbtGbp.bid.price) | currency:'GBP' }}</div>
+            <div class="var-height-2 right-align">{{ h.currentValue * currentHoldings.xbtFiatCurrentPrice | cryptocurrency:assetInformation:currentHoldings.xbtFiatExchangeCurrency
+              }} </div>
+            <!--*  | cryptocurrency:assetInformation:h.exchangeCurrency }}</div>-->
           </ion-col>
         </ion-row>
       </ion-grid>
     </ion-item>
   </ion-list>
+
+
+  <ion-card *ngIf="!currentHoldings || !assetInformation" class="card-background">
+
+    <div class="card-title">{{ 0 | currency:'GBP' }}</div>
+    <div class="card-sub-subtitle">
+      {{ 0 | currency:'GBP' }} {{ 0 | percent:'1.2-2' }}
+    </div>
+    <div class="card-subtitle">
+      <i class="cc cryptocoin cc-BTC coin-BTC-alt"></i> 0.00000 @ {{ 1 | currency:'GBP' }}
+    </div>
+
+  </ion-card>
+
+  <ion-list *ngIf="!currentHoldings || !assetInformation">
+    <ion-item>
+      <p>It is a little lonely in here. Make sure you add your API key to get all of your Kraken balances</p>
+    </ion-item>
+  </ion-list>
+
+
 
 </ion-content>

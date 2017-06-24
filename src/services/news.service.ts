@@ -1,5 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { Http, Response } from '@angular/http';
+import { Storage } from '@ionic/storage';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -8,10 +9,27 @@ import { Feed } from './../models/news';
 
 @Injectable()
 export class NewsService {
-    constructor( @Inject('newsEndPoint') private apiEndPoint: string, private http: Http) { }
+    constructor( @Inject('newsEndPoint') private apiEndPoint: string, private http: Http, private storage: Storage) { }
 
     getNews(): Observable<Feed> {
-        return this.getFeedContent('http://blog.kraken.com/rss');
+        let cacheHitObj = Observable.fromPromise(this.storage.get('newsInfo'))
+
+        return cacheHitObj.switchMap(hit => {
+
+            let now = new Date();
+            if (hit && hit.dt && Math.abs((now.getTime() - new Date(hit.dt).getTime()) / 1000) > 30000) {
+                return Observable.of(hit.result as Feed);
+            }
+            //return this.getFeedContent('http://blog.kraken.com/rss');
+            return this.http.get(this.apiEndPoint + 'http://blog.kraken.com/rss')
+                .map(this.extractFeeds)
+                .map(this.fixThumbnails)
+                .map(f => {
+                    this.storage.set('newsInfo', { dt: new Date(), result: f });
+                    return f;
+                })
+                .catch(this.handleError);
+        });
     }
 
     getFeedContent(url: string): Observable<Feed> {
@@ -27,7 +45,7 @@ export class NewsService {
     }
 
     private fixThumbnails(feed: Feed): Feed {
-        if(feed && feed.items) {
+        if (feed && feed.items) {
             const regex = new RegExp(/<figure.*?><img.*?src=\"(.*?)\"/, 'i');
             feed.items.filter(f => !f.thumbnail || f.thumbnail === '')
                 .map(f => {

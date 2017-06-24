@@ -1,57 +1,46 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { NavController, ToastController } from 'ionic-angular';
 
 import { KrakenService } from './../../services/kraken.service';
-import { Balance } from './../../models/balance';
-import { Ticker } from './../../models/ticker';
+import { CurrentHoldings, Holding } from './../../models/balance';
+import { Assets } from './../../models/asset';
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
-export class HomePage {
+export class HomePage implements OnInit {
 
-  balances: Balance[];
-  xbtGbp: Ticker;
+  currentHoldings: CurrentHoldings = new CurrentHoldings();
+  assetInformation: Assets;
 
   constructor(public navCtrl: NavController, private storage: Storage, private toastCtrl: ToastController, private kraken: KrakenService) {
+  }
 
+  ngOnInit() {
+    this.refresh(null);
   }
 
   refresh(refresher: any) {
+
     this.kraken.getAssetInfo()
       .subscribe(a => {
-        console.log(a);
+        this.assetInformation = a;
       });
 
-    this.storage.get('apiKey').then(apiKey => {
-      this.storage.get('privateKey').then(privateKey => {
-        this.kraken.getBalance(apiKey, privateKey)
-          .subscribe(b => {
-            console.log(b);
-            this.balances = b;
-            this.kraken.getTickerInformation(this.balances)
-              .subscribe(ti => {
-                Object.keys(ti).forEach(key => {
-                  if (key === 'XXBTZGBP') {
-                    this.xbtGbp = ti[key];
-                  } else {
-                    this.balances.forEach(b => {
-                      if (key === b.currency + 'XBT' || key === b.currency + 'XXBT') {
-                        b.ticker = ti[key];
-                      }
-                    })
-                  }
-                });
-
-                console.log(this.balances);
-              });
-          },
-          e => { this.displayError(e); },
-          () => { refresher.complete(); });
-      });
-    });
+    this.kraken.getOverview().subscribe(
+      currentHoldings => {
+        this.currentHoldings = currentHoldings;
+        this.currentHoldings.holdings = this.currentHoldings.holdings.sort(this._sort)
+      },
+      e => { this.displayError(e); },
+      () => { 
+        if(refresher) {
+          refresher.complete();
+        } 
+      }
+    );
   }
 
   displayError(err: any) {
@@ -62,6 +51,10 @@ export class HomePage {
       cssClass: 'warning'
     });
     toast.present();
+  }
+
+  private _sort(a: Holding, b: Holding): number {
+    return b.currentValue - a.currentValue;
   }
 
 }

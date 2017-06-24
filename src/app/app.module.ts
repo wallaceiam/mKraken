@@ -5,6 +5,9 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { IonicStorageModule } from '@ionic/storage';
 import { Camera } from '@ionic-native/camera';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
+
+import { DecimalPipe, CurrencyPipe } from '@angular/common';
+
 import { MyApp } from './app.component';
 
 import { SettingsPage } from '../pages/settings/settings';
@@ -19,6 +22,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { SumPipe } from '../pipes/sum.pipe';
 import { ProfiteLossPipe, ProfiteLossPercentPipe, TotalProfiteLossPipe, TotalProfiteLossPercentPipe } from './../pipes/profitloss.pipe';
+import { CryptoCurrencyPipe } from '../pipes/cryptocurrency.pipe';
 
 import { KrakenService} from '../services/kraken.service';
 import { NewsService } from '../services/news.service';
@@ -34,7 +38,8 @@ import { NewsService } from '../services/news.service';
     TabsPage,
 
     SumPipe,
-    ProfiteLossPipe, ProfiteLossPercentPipe, TotalProfiteLossPipe, TotalProfiteLossPercentPipe 
+    ProfiteLossPipe, ProfiteLossPercentPipe, TotalProfiteLossPipe, TotalProfiteLossPercentPipe,
+    CryptoCurrencyPipe
   ],
   imports: [
     BrowserModule,
@@ -61,9 +66,12 @@ import { NewsService } from '../services/news.service';
     KrakenService,
     NewsService,
 
+    DecimalPipe,
+    CurrencyPipe,
+
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    // {provide: 'apiEndPoint', useValue: 'http://localhost:8100/api' }
-     {provide: 'apiEndPoint', useValue: 'https://api.kraken.com' },
+     {provide: 'apiEndPoint', useValue: 'http://localhost:8100/api' },
+    // {provide: 'apiEndPoint', useValue: 'https://api.kraken.com' },
 
 
     {provide: 'newsEndPoint', useValue: 'http://rss2json.com/api.json?rss_url=' },
