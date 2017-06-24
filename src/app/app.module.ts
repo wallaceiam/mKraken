@@ -3,6 +3,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule } from '@angular/http';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { IonicStorageModule } from '@ionic/storage';
+import { Camera } from '@ionic-native/camera';
+import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { MyApp } from './app.component';
 
 import { SettingsPage } from '../pages/settings/settings';
@@ -53,20 +55,19 @@ import { NewsService } from '../services/news.service';
   providers: [
     StatusBar,
     SplashScreen,
+    Camera,
+    BarcodeScanner,
+
     KrakenService,
     NewsService,
 
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-<<<<<<< HEAD
     // {provide: 'apiEndPoint', useValue: 'http://localhost:8100/api' }
-     {provide: 'apiEndPoint', useValue: 'https://api.kraken.com' }
-=======
-    {provide: 'apiEndPoint', useValue: 'http://localhost:8100/api' },
-    // {provide: 'apiEndPoint', useValue: 'https://api.kraken.com' }
+     {provide: 'apiEndPoint', useValue: 'https://api.kraken.com' },
+
 
     {provide: 'newsEndPoint', useValue: 'http://rss2json.com/api.json?rss_url=' },
     // {provide: 'newsEndPoint', useValue: 'http://localhost:8100/news' }
->>>>>>> origin/master
   ]
 })
 export class AppModule {}

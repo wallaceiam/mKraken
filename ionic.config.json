@@ -1,6 +1,6 @@
 {
-  "name": "KrakenPortfolioManager",
-  "app_id": "",
+  "name": "mKraken",
+  "app_id": "mKraken.mymojo.ca",
   "type": "ionic-angular",
   "proxies": [
     {
