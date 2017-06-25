@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController } from 'ionic-angular';
+import { NavController, ToastController } from 'ionic-angular';
 
 import { Feed, FeedEntry } from './../../models/news';
 import { NewsService } from './../../services/news.service';
@@ -13,7 +13,7 @@ export class NewsPage implements OnInit {
 
     news: Feed;
 
-  constructor(public navCtrl: NavController, private newsService: NewsService) {
+  constructor(public navCtrl: NavController, private toastCtrl: ToastController, private newsService: NewsService) {
 
   }
 
@@ -33,8 +33,21 @@ export class NewsPage implements OnInit {
       );
     }
 
+    displayError(err: any) {
+    let toast = this.toastCtrl.create({
+      message: err,
+      duration: 3000,
+      position: 'top',
+      cssClass: 'warning'
+    });
+    toast.present();
+  }
+
     openNewsItem(item: FeedEntry) {
-        this.navCtrl.push(NewsItemPage, { item: item });
+        console.log('Opening: ' + item);
+        this.navCtrl.push(NewsItemPage, { item: item })
+            .then((v) => { console.log('Pushed'); })
+            .catch(e => { console.error(e); this.displayError(e); })
     }
 
 }

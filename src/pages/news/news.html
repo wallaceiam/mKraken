@@ -15,7 +15,7 @@
     <ion-card *ngFor="let n of (news ? news.items : [])" (click)="openNewsItem(n)">
         <img [src]="n.thumbnail" />
         <div class="card-title">{{ n.title }}</div>
-        <div class="card-subtitle">{{ n.pubDate | date }}</div>
+        <div class="card-subtitle">{{ n.pubDate }}</div>
     </ion-card>
 
 </ion-content>

@@ -34,7 +34,12 @@ export class HomePage implements OnInit {
         this.currentHoldings = currentHoldings;
         this.currentHoldings.holdings = this.currentHoldings.holdings.sort(this._sort)
       },
-      e => { this.displayError(e); },
+      e => { 
+        if(refresher) {
+          refresher.complete();
+        } 
+        this.displayError(e);
+       },
       () => { 
         if(refresher) {
           refresher.complete();

@@ -70,8 +70,8 @@ import { NewsService } from '../services/news.service';
     CurrencyPipe,
 
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-     {provide: 'apiEndPoint', useValue: 'http://localhost:8100/api' },
-    // {provide: 'apiEndPoint', useValue: 'https://api.kraken.com' },
+     // {provide: 'apiEndPoint', useValue: 'http://localhost:8100/api' },
+    {provide: 'apiEndPoint', useValue: 'https://api.kraken.com' },
 
 
     {provide: 'newsEndPoint', useValue: 'http://rss2json.com/api.json?rss_url=' },
