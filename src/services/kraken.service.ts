@@ -36,7 +36,7 @@ export class KrakenService {
         return cacheHitObj.switchMap(hit => {
 
             let now = new Date();
-            if (hit  && hit.dt && Math.abs((now.getTime() - new Date(hit.dt).getTime()) / 1000) > 30000) {
+            if (hit && hit.dt && Math.abs((now.getTime() - new Date(hit.dt).getTime()) / 1000) < 30000) {
                 return Observable.of(hit.result as CurrentHoldings);
             }
 

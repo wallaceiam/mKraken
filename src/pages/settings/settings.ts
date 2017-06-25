@@ -61,6 +61,15 @@ export class SettingsPage {
     });
   }
 
+  clearCache() {
+    this.storage.set('balanceInfo', null)
+      .then(() => {
+        this.storage.set('assetInfo', null).then(() => {
+          this._displayAlert('Cache has been cleared!');
+        });
+      });
+  }
+
   private _displayAlert(msg: any) {
     let alert = this.alertCtrl.create({
         title: 'Alert',
