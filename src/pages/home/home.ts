@@ -6,6 +6,8 @@ import { KrakenService } from './../../services/kraken.service';
 import { CurrentHoldings, Holding } from './../../models/balance';
 import { Assets } from './../../models/asset';
 
+import { CoinPage } from './../coin/coin';
+
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
@@ -34,16 +36,16 @@ export class HomePage implements OnInit {
         this.currentHoldings = currentHoldings;
         this.currentHoldings.holdings = this.currentHoldings.holdings.sort(this._sort)
       },
-      e => { 
-        if(refresher) {
+      e => {
+        if (refresher) {
           refresher.complete();
-        } 
+        }
         this.displayError(e);
-       },
-      () => { 
-        if(refresher) {
+      },
+      () => {
+        if (refresher) {
           refresher.complete();
-        } 
+        }
       }
     );
   }
@@ -60,6 +62,16 @@ export class HomePage implements OnInit {
 
   private _sort(a: Holding, b: Holding): number {
     return b.currentValue - a.currentValue;
+  }
+
+  openItem(item: Holding) {
+
+    if (item.currency !== this.currentHoldings.xbtFiatExchangeCurrency) {
+      console.log('Opening: ' + item);
+      this.navCtrl.push(CoinPage, { currentHoldings: this.currentHoldings, item: item })
+        .then((v) => { console.log('Pushed'); })
+        .catch(e => { console.error(e); this.displayError(e); });
+    }
   }
 
 }
