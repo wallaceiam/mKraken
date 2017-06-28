@@ -36,16 +36,11 @@ export class KrakenService {
         return cacheHitObj.switchMap(hit => {
 
             let now = new Date();
-<<<<<<< HEAD
-            if (hit && hit.dt && Math.abs((now.getTime() - new Date(hit.dt).getTime()) / 1000) < 30000) {
-                return Observable.of(hit.result as CurrentHoldings);
-=======
             if (hit && hit.dt && (now.valueOf() - new Date(hit.dt).valueOf()) / 1000 < 30) {
                 let cacheHoldings = hit.result as CurrentHoldings;
                 let currentHoldings = new CurrentHoldings(cacheHoldings);
                 return Observable.of(currentHoldings);
                 //return Observable.of(hit.result as CurrentHoldings);
->>>>>>> origin/master
             }
 
             let apiKeyObjs = Observable.fromPromise(this.storage.get('apiKey'));
