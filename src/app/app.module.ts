@@ -15,6 +15,7 @@ import { ContactPage } from '../pages/contact/contact';
 import { NewsPage } from '../pages/news/news';
 import { NewsItemPage } from '../pages/news/newsitem';
 import { HomePage } from '../pages/home/home';
+import { CoinPage } from '../pages/coin/coin';
 import { TabsPage } from '../pages/tabs/tabs';
 
 import { StatusBar } from '@ionic-native/status-bar';
@@ -35,6 +36,7 @@ import { NewsService } from '../services/news.service';
     NewsPage,
     NewsItemPage,
     HomePage,
+    CoinPage,
     TabsPage,
 
     SumPipe,
@@ -55,6 +57,7 @@ import { NewsService } from '../services/news.service';
     NewsPage,
     NewsItemPage,
     HomePage,
+    CoinPage,
     TabsPage
   ],
   providers: [

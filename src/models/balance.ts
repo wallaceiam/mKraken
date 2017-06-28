@@ -47,20 +47,26 @@ export class CurrentHoldings {
         if (!this.holdings) {
             return 0;
         }
-        return this.holdings.reduce((p, h) => { p += h.value * h.currentPrice; return p; }, 0);
+        return this.holdings.reduce((p, h) => { 
+            p += h.currency.startsWith('Z') ? 0 : h.value * 
+                (h.exchangeCurrency === this.xbtFiatExchangeCurrency ? 1 : h.currentPrice); 
+            return p; 
+        }, 0);
     }
     get totalPrice() {
-        if (!this.holdings) {
-            return 0;
-        }
-        return this.holdings.reduce((p, h) => { p += h.value * h.currentPrice; return p; }, 0) * this.xbtFiatCurrentPrice;
+        return this.totalValue * this.xbtFiatCurrentPrice;
     }
 
     get totalProfitLoss() {
         if (!this.holdings) {
             return 0;
         }
-        return this.holdings.reduce((p, h) => { p += (h.value * h.currentPrice) - (h.value * h.openningPrice); return p; }, 0) * this.xbtFiatCurrentPrice;
+        return this.holdings.reduce((p, h) => { 
+            p += h.currency.startsWith('Z') ? 0 : 
+                (h.value * (h.exchangeCurrency === this.xbtFiatExchangeCurrency ? 1 : h.currentPrice)) 
+                - (h.value * (h.exchangeCurrency === this.xbtFiatExchangeCurrency ? 1 : h.openningPrice)); 
+            return p; 
+        }, 0) * this.xbtFiatCurrentPrice;
     }
 
     get totalProfitLossPercent() {
@@ -68,8 +74,10 @@ export class CurrentHoldings {
             return 0;
         }
         let current = this.holdings.reduce((p, h) => {
-            p.current += (h.value * h.currentPrice);
-            p.openning += (h.value * h.openningPrice);
+            p.current += h.currency.startsWith('Z') ? 0 : (h.value * 
+                (h.exchangeCurrency === this.xbtFiatExchangeCurrency ? 1 : h.currentPrice)) ;
+            p.openning += h.currency.startsWith('Z') ? 0 : (h.value *
+                (h.exchangeCurrency === this.xbtFiatExchangeCurrency ? 1 : h.openningPrice));
             return p;
         }, { current: 0, openning: 0 });
 

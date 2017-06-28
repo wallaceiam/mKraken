@@ -17,7 +17,7 @@ export class NewsService {
         return cacheHitObj.switchMap(hit => {
 
             let now = new Date();
-            if (hit && hit.dt && Math.abs((now.getTime() - new Date(hit.dt).getTime()) / 1000) > 30000) {
+            if (hit && hit.dt && (now.valueOf() - new Date(hit.dt).valueOf()) / 1000 < 60) {
                 return Observable.of(hit.result as Feed);
             }
             //return this.getFeedContent('http://blog.kraken.com/rss');
