@@ -21,16 +21,30 @@ export class CurrentHoldings {
     xbtFiatExchangeCurrency: string;
     xbtFiatExchangeDisplayCurrency: string;
 
-    constructor() {
+    constructor(currentHoldings: CurrentHoldings = null) {
+        if (!currentHoldings) {
+            this.xbtFiatCurrentPrice = 1;
+            this.xbtFiatExchangeCurrency = 'GBP';
+            this.xbtFiatExchangeDisplayCurrency = 'GBP';
+            this.xbtFiatOpenningPrice = 1;
+        } else {
+            this.xbtFiatCurrentPrice = currentHoldings.xbtFiatCurrentPrice;
+            this.xbtFiatExchangeCurrency = currentHoldings.xbtFiatExchangeCurrency;
+            this.xbtFiatExchangeDisplayCurrency = currentHoldings.xbtFiatExchangeDisplayCurrency;
+            this.xbtFiatOpenningPrice = currentHoldings.xbtFiatOpenningPrice;
+        }
         this.holdings = new Array<Holding>();
-        this.xbtFiatCurrentPrice = 1;
-        this.xbtFiatExchangeCurrency = 'GBP';
-        this.xbtFiatExchangeDisplayCurrency = 'GBP';
-        this.xbtFiatOpenningPrice = 1;
+
+        if (currentHoldings && currentHoldings.holdings) {
+            currentHoldings.holdings.forEach(h => {
+                this.holdings.push(new Holding(h));
+            })
+        }
+
     }
 
     get totalValue() {
-        if(!this.holdings) {
+        if (!this.holdings) {
             return 0;
         }
         return this.holdings.reduce((p, h) => { p += h.value * h.currentPrice; return p; }, 0);
@@ -72,6 +86,18 @@ export class Holding {
     openningPrice: number;
     exchangeCurrency: string;
     exchangeDisplayCurrency: string;
+
+    constructor(holding: Holding = null) {
+        if (holding) {
+            this.currency = holding.currency;
+            this.displayCurrency = holding.displayCurrency;
+            this.value = holding.value;
+            this.currentPrice = holding.currentPrice;
+            this.openningPrice = holding.openningPrice;
+            this.exchangeCurrency = holding.exchangeCurrency;
+            this.exchangeDisplayCurrency = holding.exchangeDisplayCurrency;
+        }
+    }
 
     get currentValue() {
         return this.value * this.currentPrice;

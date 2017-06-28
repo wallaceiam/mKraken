@@ -37,7 +37,10 @@ export class KrakenService {
 
             let now = new Date();
             if (hit  && hit.dt && Math.abs((now.getTime() - new Date(hit.dt).getTime()) / 1000) > 30000) {
-                return Observable.of(hit.result as CurrentHoldings);
+                let cacheHoldings = hit.result as CurrentHoldings;
+                let currentHoldings = new CurrentHoldings(cacheHoldings);
+                return Observable.of(currentHoldings);
+                //return Observable.of(hit.result as CurrentHoldings);
             }
 
             let apiKeyObjs = Observable.fromPromise(this.storage.get('apiKey'));
@@ -124,7 +127,7 @@ export class KrakenService {
             })
             .map(res => {
                 if (res.error && res.error.length > 0) {
-                    Observable.throw(res.error);
+                    return Observable.throw(res.error);
                 }
 
                 let balances = new Array<Balance>();
@@ -165,7 +168,7 @@ export class KrakenService {
             })
             .map(res => {
                 if (res.error && res.error.length > 0) {
-                    Observable.throw(res.error);
+                    return Observable.throw(res.error);
                 }
 
                 let assets = new Assets();
@@ -195,7 +198,7 @@ export class KrakenService {
 
         let pairs = 'pair=XBTGBP,';
         pairs += balances
-            .filter(b => b.currency !== 'XBT' && b.currency !== 'GBP')
+            .filter(b => b.currency !== 'XBT' && b.currency !== 'GBP' && !b.currency.startsWith('Z'))
             .map(b => b.currency + 'XBT').join(',');
 
         // let headers = new Headers();
@@ -210,7 +213,7 @@ export class KrakenService {
             })
             .map(res => {
                 if (res.error && res.error.length > 0) {
-                    Observable.throw(res.error);
+                    return Observable.throw(res.error);
                 }
 
                 let ticker = new TickerInformation();
